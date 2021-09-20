@@ -28,8 +28,8 @@ class User < ApplicationRecord
   end
 
   def self.search(params)
-    param.strip!
-    to_send_back = (first_name_matches(param) + last_name_mathes(param) + email_matches(param)).uniq
+    params.strip!
+    to_send_back = (first_name_matches(params) + last_name_matches(params) + email_matches(params)).uniq
     return nil unless to_send_back
     to_send_back
   end
@@ -48,5 +48,13 @@ class User < ApplicationRecord
 
   def self.matches(field_name, param)
     where("#{field_name} like ?", "%#{param}%")
+  end
+
+  def except_current_user(user)
+    user.reject { |user| user.id == self.id }
+  end
+
+  def not_friends_with?(id_of_friend)
+    !self.friends.where(id: id_of_friend).exists?
   end
 end
